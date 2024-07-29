@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Simulator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #BB86FC;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            background: #1F1B24;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 500px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #CF6679;
+        }
+        input[type="file"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #333;
+            color: #E0E0E0;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            border-color: #BB86FC;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #BB86FC;
+            color: #121212;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #9f6ad7
+        }
+        @media (max-width: 600px) {
+            form {
+                padding: 15px;
+                width: 90%;
+            }
+            input[type="file"], select, button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Cache Simulator</h1>
+    <form id="simulatorForm" enctype="multipart/form-data">
+        <label for="input_file">Input File:</label>
+        <input type="file" id="input_file" name="input_file" required>
+        
+        <label for="cache_size">Cache Size:</label>
+        <select id="cache_size" name="cache_size" required>
+            <option value="32">32 KB</option>
+            <option value="64">64 KB</option>
+            <option value="128">128 KB</option>
+            <option value="256">256 KB</option>
+            <option value="512">512 KB</option>
+            <!-- Add more sizes as needed -->
+        </select>
+
+        <label for="associativity">Associativity:</label>
+        <select id="associativity" name="associativity" required>
+            <option value="1">Direct Mapped</option>
+            <option value="2">2-Way</option>
+            <option value="4">4-Way</option>
+            <option value="8">8-Way</option>
+            <!-- Add more associativities as needed -->
+        </select>
+
+        <label for="block_size">Block Size:</label>
+        <select id="block_size" name="block_size" required>
+            <option value="16">16 Bytes</option>
+            <option value="32">32 Bytes</option>
+            <option value="64">64 Bytes</option>
+            <option value="128">128 Bytes</option>
+            <!-- Add more block sizes as needed -->
+        </select>
+
+        <label for="algorithm_type">Replacement Algorithm:</label>
+        <select id="algorithm_type" name="algorithm_type" required>
+            <option value="LRU">LRU (Least Recently Used)</option>
+            <option value="LFU">LFU (Least Frequently Used)</option>
+            <option value="ARC">ARC (Adaptive Replacement Cache)</option>
+            <option value="WTinyLFU">WTinyLFU (Window TinyLFU)</option>
+            <option value="Random">Random</option>
+            <!-- Add more algorithms as needed -->
+        </select>
+
+        <label for="access_length">Access Length:</label>
+        <input type="number" id="access_length" name="access_length" min="1" max="1000" value="100" required>
+
+        <label for="locality_degree">Locality Degree:</label>
+        <input type="number" id="locality_degree" name="locality_degree" min="0" max="1" step="0.01" value="0.5" required>
+
+        <button type="submit">Run Simulator</button>
+    </form>
+
+    <script>
+        document.getElementById('simulatorForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('/run_simulator', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    window.location.href = `/result?hit_rate=${data.hit_rate}&miss_rate=${data.miss_rate}&time_complexity=${data.time_complexity}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
